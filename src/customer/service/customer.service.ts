@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { CustomerDto } from '../dto/customer.dto';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { SaveCustomerDto } from '../dtos/save-customer.dto';
+import { CustomerInterface } from '../interfaces/customer.interface';
+import { GetCustomerDto } from '../dtos/get-customer.dto';
 
 @Injectable()
 export class CustomerService {
-  customers: CustomerDto[] = [
+  customers: CustomerInterface[] = [
     {
       uuid: '1',
       nombre: 'Sebastian',
@@ -21,57 +23,76 @@ export class CustomerService {
     {
       uuid: '3',
       nombre: 'Humberto',
-      apellidos: 'Barrera Bernal',
       telefono: 3333333,
       documento: '456789123',
     },
   ];
+  getCustomers(): GetCustomerDto[] {
+    return this.customers;
+  }
+  getCustomerByUuid(uuid: string): GetCustomerDto {
+    const customer = this.customers.find(
+      (customer: GetCustomerDto) => customer.uuid == uuid,
+    );
+    if (customer == undefined) {
+      throw new HttpException(
+        `Customer with uuid ${uuid} does not exist`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return customer;
+  }
+  createCustomer(newCustomer: SaveCustomerDto): SaveCustomerDto {
+    this.customers.push(newCustomer);
+    return newCustomer;
+  }
+  updateCustomer(
+    uuid: string,
+    customerUpdate: SaveCustomerDto,
+  ): SaveCustomerDto {
+    const customer = this.customers.find(
+      (customer: SaveCustomerDto) => customer.uuid == uuid,
+    );
+    if (customer == undefined) {
+      throw new HttpException(
+        `Customer with uuid ${uuid} does not exist`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    customer.nombre = customerUpdate.nombre;
+    customer.apellidos = customerUpdate.apellidos;
+    customer.telefono = customerUpdate.telefono;
+    customer.documento = customerUpdate.documento;
+    return customer;
+  }
+  updatePatchCustomer(
+    uuid: string,
+    customerUpdate: SaveCustomerDto,
+  ): SaveCustomerDto {
+    const customer = this.customers.find(
+      (customer: SaveCustomerDto) => customer.uuid == uuid,
+    );
+    if (customer == undefined) {
+      throw new HttpException(
+        `Customer with uuid ${uuid} does not exist`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    const customerPatch: SaveCustomerDto = {
+      ...customer,
+      ...customerUpdate,
+    };
+    this.customers = this.customers.map((customer: SaveCustomerDto) => {
+      return customer.uuid == uuid ? customerPatch : customer;
+    });
+    return customerPatch;
+  }
   deleteCustomer(uuid: string): boolean {
     const customerIndex = this.customers.findIndex(
-      (customer: CustomerDto) => customer.uuid == uuid,
+      (customer: CustomerInterface) => customer.uuid == uuid,
     );
     if (customerIndex == -1) return false;
     this.customers.splice(customerIndex, 1);
     return true;
-  }
-  updatePatchCustomer(uuid: string, customerUpdate: CustomerDto) {
-    const customer = this.customers.find(
-      (customer: CustomerDto) => customer.uuid == uuid,
-    );
-    if (customer != undefined) {
-      const customerPatch: CustomerDto = {
-        ...customer,
-        ...customerUpdate,
-      };
-      this.customers = this.customers.map((customer: CustomerDto) => {
-        return customer.uuid == uuid ? customerPatch : customer;
-      });
-      return customerPatch;
-    }
-    return customer;
-  }
-  updateCustomer(uuid: string, customerUpdate: CustomerDto) {
-    const customer = this.customers.find(
-      (customer: CustomerDto) => customer.uuid == uuid,
-    );
-    if (customer != undefined) {
-      customer.nombre = customerUpdate.nombre;
-      customer.apellidos = customerUpdate.apellidos;
-      customer.telefono = customerUpdate.telefono;
-      customer.documento = customerUpdate.documento;
-    }
-    return customer;
-  }
-  createCustomer(newCustomer: CustomerDto): CustomerDto {
-    this.customers.push(newCustomer);
-    return newCustomer;
-  }
-  getCustomerByUuid(uuid: string): import('../dto/customer.dto').CustomerDto {
-    return this.customers.find(
-      (customer: CustomerDto) => customer.uuid == uuid,
-    );
-  }
-  getCustomers(): import('../dto/customer.dto').CustomerDto[] {
-    return this.customers;
   }
 }

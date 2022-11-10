@@ -10,19 +10,20 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { CustomerService } from '../service/customer.service';
-import { CustomerDto } from '../dto/customer.dto';
+import { SaveCustomerDto } from '../dtos/save-customer.dto';
+import { GetCustomerDto } from '../dtos/get-customer.dto';
 
 @Controller('customer')
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
   @Get()
-  getAllCustomers(): CustomerDto[] {
+  getAllCustomers(): GetCustomerDto[] {
     return this.customerService.getCustomers();
   }
 
   @Get(':uuid')
-  getCustomerByUuid(@Param('uuid') uuid: string): CustomerDto | undefined {
+  getCustomerByUuid(@Param('uuid') uuid: string): GetCustomerDto {
     return this.customerService.getCustomerByUuid(uuid);
   }
 
@@ -35,24 +36,24 @@ export class CustomerController {
         forbidNonWhitelisted: true,
       }),
     )
-    newCustomer: CustomerDto,
-  ): CustomerDto {
+    newCustomer: SaveCustomerDto,
+  ): SaveCustomerDto {
     return this.customerService.createCustomer(newCustomer);
   }
 
   @Put(':uuid')
   updateCustomer(
     @Param('uuid') uuid: string,
-    @Body() customerUpdate: CustomerDto,
-  ) {
+    @Body() customerUpdate: SaveCustomerDto,
+  ): SaveCustomerDto {
     return this.customerService.updateCustomer(uuid, customerUpdate);
   }
 
   @Patch(':uuid')
   updatePatchCustomer(
     @Param('uuid') uuid: string,
-    @Body() customerUpdate: CustomerDto,
-  ) {
+    @Body() customerUpdate: SaveCustomerDto,
+  ): SaveCustomerDto {
     return this.customerService.updatePatchCustomer(uuid, customerUpdate);
   }
 
