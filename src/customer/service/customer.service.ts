@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { SaveCustomerDto } from '../dtos/save-customer.dto';
 import { CustomerInterface } from '../interfaces/customer.interface';
 import { GetCustomerDto } from '../dtos/get-customer.dto';
+import { PatchCustomerDto } from '../dtos/patch-customer.dto';
 
 @Injectable()
 export class CustomerService {
@@ -67,10 +68,10 @@ export class CustomerService {
   }
   updatePatchCustomer(
     uuid: string,
-    customerUpdate: SaveCustomerDto,
-  ): SaveCustomerDto {
+    customerUpdate: PatchCustomerDto,
+  ): PatchCustomerDto {
     const customer = this.customers.find(
-      (customer: SaveCustomerDto) => customer.uuid == uuid,
+      (customer: PatchCustomerDto) => customer.uuid == uuid,
     );
     if (customer == undefined) {
       throw new HttpException(
@@ -78,11 +79,11 @@ export class CustomerService {
         HttpStatus.NOT_FOUND,
       );
     }
-    const customerPatch: SaveCustomerDto = {
+    const customerPatch: PatchCustomerDto = {
       ...customer,
       ...customerUpdate,
     };
-    this.customers = this.customers.map((customer: SaveCustomerDto) => {
+    this.customers = this.customers.map((customer: PatchCustomerDto) => {
       return customer.uuid == uuid ? customerPatch : customer;
     });
     return customerPatch;

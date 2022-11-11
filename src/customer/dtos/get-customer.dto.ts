@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 export class GetCustomerDto implements CustomerInterface {
   @IsNotEmpty({
-    message: 'The `nombre` argument must not be empty',
+    message: 'The `uuid` argument must not be empty',
   })
   @IsUUID()
   uuid: string;

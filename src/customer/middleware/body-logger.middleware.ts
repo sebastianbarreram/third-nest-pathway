@@ -5,7 +5,7 @@ import { Request, Response, NextFunction } from 'express';
 export class BodyLoggerMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     console.log('Request Body...', req.body);
-    if (req.params.uuid != undefined) {
+    if (req.params.uuid) {
       console.log(req.params);
     }
     next();

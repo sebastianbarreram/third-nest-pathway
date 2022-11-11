@@ -1,6 +1,6 @@
 import { IsInt, IsOptional, IsString, IsUUID } from 'class-validator';
 import { CustomerInterface } from '../interfaces/customer.interface';
-export class SaveCustomerDto implements CustomerInterface {
+export class PatchCustomerDto implements CustomerInterface {
   @IsOptional()
   @IsUUID()
   uuid: string;
